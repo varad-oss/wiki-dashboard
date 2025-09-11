@@ -1,70 +1,104 @@
-# Getting Started with Create React App
+WikiDash: Real-Time Wikipedia Analytics Dashboard
+WikiDash is a dynamic, single-page web application built with React and Tailwind CSS that provides a deep-dive analysis of any Wikipedia article. Users can enter a page title to fetch and display a rich set of statistics, metadata, and engagement metrics in a clean, intuitive, and visually appealing interface.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Features
+Core Page Information: View the Page Title, ID, and total length in bytes.
 
-## Available Scripts
+Edit History: See the creation date, date of the last edit, the username of the last editor, and the total number of unique editors.
 
-In the project directory, you can run:
+Content Analysis: Read the full introductory summary with formatted headings, and view the article's main thumbnail.
 
-### `npm start`
+Connectivity: Browse scrollable lists of all pages the article links to and all pages that link back to it.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Audience Engagement Metrics:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Visualize the daily page views for the last 30 days with an interactive chart.
 
-### `npm test`
+View total and average daily page views.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+See the number of languages the article is available in.
 
-### `npm run build`
+User-Friendly Interface:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+A robust search that handles case-insensitivity and redirects.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+A "View Analytics" button for quickly navigating to the data visualizations.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Clear loading and error states to ensure a smooth user experience.
 
-### `npm run eject`
+Tech Stack
+Frontend: React.js
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Styling: Tailwind CSS
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Charts & Visualization: Chart.js (with react-chartjs-2)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+API: MediaWiki Action API & Wikimedia Pageviews API
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Setup and Running the Project
+Follow these instructions to get the project running on your local machine.
 
-## Learn More
+Prerequisites
+You must have Node.js and npm (Node Package Manager) installed on your computer. You can download them from the official Node.js website.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Installation & Setup
+Clone the repository to your local machine:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+git clone [https://github.com/your-username/wiki-dashboard.git](https://github.com/your-username/wiki-dashboard.git)
 
-### Code Splitting
+Navigate into the project directory:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+cd wiki-dashboard
 
-### Analyzing the Bundle Size
+Install all the necessary dependencies:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+npm install
 
-### Making a Progressive Web App
+Running the Application
+Start the development server:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+npm start
 
-### Advanced Configuration
+Open your browser: The application will automatically open in your default browser at http://localhost:3000.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Usage
+The application loads with a default search term (e.g., "Lana Rhoades").
 
-### Deployment
+Enter any Wikipedia article title into the search bar.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Click the "Analyze" button to fetch the data.
 
-### `npm run build` fails to minify
+Once the data is loaded, the dashboard will populate with the article's summary and statistics.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+If the article summary is long, a "View Analytics" button will appear. Click it to smoothly scroll down to the page views chart and other metrics.
+
+Challenges and Technical Decisions
+This project involved several challenges related to handling real-world, asynchronous data and presenting it effectively. Here’s an overview of the key problems and the solutions implemented.
+
+1. Challenge: API Performance and Concurrency
+Problem: Fetching all the required data points (core info, links, revisions, pageviews, etc.) required multiple API calls. Making these calls sequentially would result in a slow and unresponsive user experience.
+
+Technical Decision: Orchestrate all API calls to run concurrently using Promise.allSettled.
+
+Reasoning: Promise.allSettled was chosen over Promise.all for its resilience. The Wikimedia Pageviews API sometimes fails for new or obscure articles. With Promise.allSettled, a failure in this non-critical endpoint does not prevent the rest of the dashboard from loading. The application can gracefully handle the missing data (e.g., by showing "0" views) instead of showing a complete error to the user.
+
+2. Challenge: Handling Inconsistent API Behavior
+Problem: Different Wikipedia APIs have different requirements. The main query API is flexible with search terms (e.g., "albert einstein" works), but the Pageviews API is strict and requires the exact, correctly-capitalized page title ("Albert Einstein"). This caused 404 Not Found errors for case-insensitive searches.
+
+Technical Decision: Implement a "pre-flight" API call. Before fetching the main data, the application first uses the flexible list=search endpoint to find the official, canonical title for the user's query. This correct title is then used for all subsequent, stricter API calls.
+
+Reasoning: This two-step process makes the application much more robust and user-friendly, as it accommodates natural user input without breaking.
+
+3. Challenge: Parsing and Displaying Raw Wikitext
+Problem: The API returns the article summary as raw "wikitext," including markup like == Section Heading ==, [[Internal Link|Display Text]], and '''bold text'''. Displaying this raw text is unreadable and unprofessional.
+
+Technical Decision: Create a dedicated React component (WikiText.js) to parse and format this content.
+
+Reasoning: Encapsulating this logic in a separate component follows the principle of separation of concerns. The component uses regular expressions to identify and replace wikitext syntax with appropriate HTML tags (<h3>, <strong>, <em>). This keeps the main App.js component clean and focused on layout and state management, while the WikiText component handles the complex task of presentation.
+
+4. Challenge: Responsive and Clean Layout
+Problem: The initial two-column layout created awkward, large empty spaces when an article summary was significantly longer than the list of stats. This led to a visually unbalanced and unprofessional appearance.
+
+Technical Decision: Refactor the layout to a more modern, single-column flow. The core stats were moved into a compact, horizontal "stats bar" below the main summary. The rest of the content (analytics, link lists) is stacked vertically in its own distinct sections.
+
+Reasoning: This vertical flow is more robust and naturally responsive. It eliminates the empty space problem and ensures the layout is clean and logical on all screen sizes, from mobile devices to large desktops.
