@@ -98,7 +98,7 @@ Problem: The API returns the article summary as raw "wikitext," including markup
 
 Technical Decision: Create a dedicated React component (WikiText.js) to parse and format this content.
 
-Reasoning: Encapsulating this logic in a separate component follows the principle of separation of concerns. The component uses regular expressions to identify and replace wikitext syntax with appropriate HTML tags (<h3>, <strong>, <em>). This keeps the main App.js component clean and focused on layout and state management, while the WikiText component handles the complex task of presentation.
+Reasoning: Encapsulating this logic in a separate component follows the principle of separation of concerns. The component uses regular expressions to identify and replace wikitext syntax with appropriate HTML tags (`<h3>`, `<strong>`, `<em>`). This keeps the main App.js component clean and focused on layout and state management, while the WikiText component handles the complex task of presentation.
 
 4. Challenge: Responsive and Clean Layout
 Problem: The initial two-column layout created awkward, large empty spaces when an article summary was significantly longer than the list of stats. This led to a visually unbalanced and unprofessional appearance.
