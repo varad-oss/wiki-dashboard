@@ -15,7 +15,7 @@ const StatItem = ({ icon, label, value }) => (
 );
 
 function App() {
-  const [searchTerm, setSearchTerm] = useState('Albert Einstein');
+  const [searchTerm, setSearchTerm] = useState(' Lana Rhoades');
   const [pageData, setPageData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -68,7 +68,7 @@ function App() {
         </header>
 
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 mb-10 shadow-lg">
-          <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="e.g., Albert Einstein" className="flex-grow bg-slate-800 border-2 border-slate-700 rounded-md px-4 py-3 text-lg focus:outline-none focus:ring-4 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all duration-300" />
+          <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="e.g., Lana Rhoades" className="flex-grow bg-slate-800 border-2 border-slate-700 rounded-md px-4 py-3 text-lg focus:outline-none focus:ring-4 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all duration-300" />
           <div className="flex gap-3">
             <button type="submit" disabled={loading} className="bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 disabled:bg-slate-500 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-md transition-all duration-300 transform hover:scale-105 shadow-md">
               {loading ? 'Analyzing...' : 'Analyze'}

@@ -46,18 +46,22 @@ Clone the repository to your local machine:
 
 git clone [https://github.com/your-username/wiki-dashboard.git](https://github.com/your-username/wiki-dashboard.git)
 
+
 Navigate into the project directory:
 
 cd wiki-dashboard
+
 
 Install all the necessary dependencies:
 
 npm install
 
+
 Running the Application
 Start the development server:
 
 npm start
+
 
 Open your browser: The application will automatically open in your default browser at http://localhost:3000.
 
