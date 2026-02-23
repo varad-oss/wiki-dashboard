@@ -1,108 +1,71 @@
-WikiDash: Real-Time Wikipedia Analytics Dashboard
-WikiDash is a dynamic, single-page web application built with React and Tailwind CSS that provides a deep-dive analysis of any Wikipedia article. Users can enter a page title to fetch and display a rich set of statistics, metadata, and engagement metrics in a clean, intuitive, and visually appealing interface.
+**WikiDash | Enterprise-Grade Wikipedia Analytics Dashboard**
 
-Features
-Core Page Information: View the Page Title, ID, and total length in bytes.
+WikiDash is a high-performance React application designed to provide comprehensive, real-time data visualization and metadata analysis for Wikipedia articles. By integrating multiple RESTful APIs, the platform transforms raw academic data into actionable insights through an intuitive, data-driven user interface.
 
-Edit History: See the creation date, date of the last edit, the username of the last editor, and the total number of unique editors.
+**Key Engineering Highlights**
 
-Content Analysis: Read the full introductory summary with formatted headings, and view the article's main thumbnail.
+Real-Time Data Aggregation: Orchestrates concurrent requests to the MediaWiki Action API and Wikimedia Metrics API.
 
-Connectivity: Browse scrollable lists of all pages the article links to and all pages that link back to it.
+Interactive Visualizations: Implements dynamic time-series charts using Chart.js to track 30-day engagement trends.
 
-Audience Engagement Metrics:
+Intelligent Search Normalization: Features a pre-flight verification layer to handle case-insensitivity, redirects, and title canonicalization.
 
-Visualize the daily page views for the last 30 days with an interactive chart.
+Responsive Architecture: A mobile-first, grid-based layout engineered with Tailwind CSS for seamless cross-device compatibility.
 
-View total and average daily page views.
+**Tech Stack**
 
-See the number of languages the article is available in.
+Core: React.js (Functional Components, Hooks)
 
-User-Friendly Interface:
+Styling: Tailwind CSS (Modern Utility-First Design)
 
-A robust search that handles case-insensitivity and redirects.
+Data Visualization: Chart.js / React-Chartjs-2
 
-A "View Analytics" button for quickly navigating to the data visualizations.
+APIs: MediaWiki Action REST API, Wikimedia Pageviews REST API
 
-Clear loading and error states to ensure a smooth user experience.
+Version Control: Git/GitHub
 
-Tech Stack
-Frontend: React.js
+**Engineering Challenges & Technical Decisions**
 
-Styling: Tailwind CSS
+1. Optimizing Asynchronous Operations (Fault Tolerance)
 
-Charts & Visualization: Chart.js (with react-chartjs-2)
+Challenge: Aggregating data from five distinct API endpoints created a performance bottleneck and increased the risk of total application failure if a single non-critical request failed.
+Decision: Implemented Promise.allSettled instead of Promise.all.
+Outcome: Enhanced the application's resilience. If the Pageviews API (external metric) is delayed or unavailable, the core article data still renders, ensuring 100% uptime for primary content while gracefully handling secondary data gaps.
 
-API: MediaWiki Action API & Wikimedia Pageviews API
+2. Solving API Strictness with Title Normalization
 
-Setup and Running the Project
-Follow these instructions to get the project running on your local machine.
+Challenge: The Wikimedia Pageviews API is case-sensitive and strictly requires canonical titles, whereas user input is often informal (e.g., "albert einstein" vs "Albert Einstein").
+Decision: Developed a "Pre-flight Search Layer" using the list=search endpoint.
+Outcome: The system automatically resolves user queries to the official Wikipedia entry title before executing data fetches, eliminating 404 errors and significantly improving the Search UX.
 
-Prerequisites
-You must have Node.js and npm (Node Package Manager) installed on your computer. You can download them from the official Node.js website.
+3. Parsing Raw Wikitext to Structured UI
 
-Installation & Setup
-Clone the repository to your local machine:
+Challenge: The API returns raw wikitext (e.g., '''bold''', [[links]]), which is unreadable in a standard web view.
+Decision: Built a custom Regex-based parsing component (WikiText.js) to sanitize and convert wikitext into semantic HTML (<h3>, <strong>, <em>).
+Outcome: Successfully maintained the "Separation of Concerns" principle, keeping the main application logic light while delivering a clean, readable, and professional typography experience.
 
-git clone [https://github.com/your-username/wiki-dashboard.git](https://github.com/your-username/wiki-dashboard.git)
+4. UX Optimization: Layout Refactoring
+
+Challenge: Traditional two-column layouts caused "visual debt" and large vertical gaps when article summaries were lengthy.
+Decision: Refactored the architecture to a single-column, component-stacked flow with a high-density horizontal "Stats Bar."
+Outcome: Improved data readability and ensured that critical analytics are consistently positioned, regardless of content length. Added a smooth-scroll "View Analytics" trigger to bridge the gap between content and data.
+
+**Installation & Deployment**
+
+Clone Repository:
+
+git clone [https://github.com/varad-oss/wiki-dashboard.git](https://github.com/varad-oss/wiki-dashboard.git)
 
 
-Navigate into the project directory:
+Environment Setup:
 
 cd wiki-dashboard
-
-
-Install all the necessary dependencies:
-
 npm install
 
 
-Running the Application
-Start the development server:
+Local Execution:
 
 npm start
 
 
-Open your browser: The application will automatically open in your default browser at http://localhost:3000.
-
-Usage
-The application loads with a default search term (e.g., "Lana Rhoades").
-
-Enter any Wikipedia article title into the search bar.
-
-Click the "Analyze" button to fetch the data.
-
-Once the data is loaded, the dashboard will populate with the article's summary and statistics.
-
-If the article summary is long, a "View Analytics" button will appear. Click it to smoothly scroll down to the page views chart and other metrics.
-
-Challenges and Technical Decisions
-This project involved several challenges related to handling real-world, asynchronous data and presenting it effectively. Here’s an overview of the key problems and the solutions implemented.
-
-1. Challenge: API Performance and Concurrency
-Problem: Fetching all the required data points (core info, links, revisions, pageviews, etc.) required multiple API calls. Making these calls sequentially would result in a slow and unresponsive user experience.
-
-Technical Decision: Orchestrate all API calls to run concurrently using Promise.allSettled.
-
-Reasoning: Promise.allSettled was chosen over Promise.all for its resilience. The Wikimedia Pageviews API sometimes fails for new or obscure articles. With Promise.allSettled, a failure in this non-critical endpoint does not prevent the rest of the dashboard from loading. The application can gracefully handle the missing data (e.g., by showing "0" views) instead of showing a complete error to the user.
-
-2. Challenge: Handling Inconsistent API Behavior
-Problem: Different Wikipedia APIs have different requirements. The main query API is flexible with search terms (e.g., "albert einstein" works), but the Pageviews API is strict and requires the exact, correctly-capitalized page title ("Albert Einstein"). This caused 404 Not Found errors for case-insensitive searches.
-
-Technical Decision: Implement a "pre-flight" API call. Before fetching the main data, the application first uses the flexible list=search endpoint to find the official, canonical title for the user's query. This correct title is then used for all subsequent, stricter API calls.
-
-Reasoning: This two-step process makes the application much more robust and user-friendly, as it accommodates natural user input without breaking.
-
-3. Challenge: Parsing and Displaying Raw Wikitext
-Problem: The API returns the article summary as raw "wikitext," including markup like == Section Heading ==, [[Internal Link|Display Text]], and '''bold text'''. Displaying this raw text is unreadable and unprofessional.
-
-Technical Decision: Create a dedicated React component (WikiText.js) to parse and format this content.
-
-Reasoning: Encapsulating this logic in a separate component follows the principle of separation of concerns. The component uses regular expressions to identify and replace wikitext syntax with appropriate HTML tags (`<h3>`, `<strong>`, `<em>`). This keeps the main App.js component clean and focused on layout and state management, while the WikiText component handles the complex task of presentation.
-
-4. Challenge: Responsive and Clean Layout
-Problem: The initial two-column layout created awkward, large empty spaces when an article summary was significantly longer than the list of stats. This led to a visually unbalanced and unprofessional appearance.
-
-Technical Decision: Refactor the layout to a more modern, single-column flow. The core stats were moved into a compact, horizontal "stats bar" below the main summary. The rest of the content (analytics, link lists) is stacked vertically in its own distinct sections.
-
-Reasoning: This vertical flow is more robust and naturally responsive. It eliminates the empty space problem and ensures the layout is clean and logical on all screen sizes, from mobile devices to large desktops.
+The application will initialize on http://localhost:3000.
