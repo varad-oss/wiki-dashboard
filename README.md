@@ -41,7 +41,7 @@ Outcome: The system automatically resolves user queries to the official Wikipedi
 3. Parsing Raw Wikitext to Structured UI
 
 Challenge: The API returns raw wikitext (e.g., '''bold''', [[links]]), which is unreadable in a standard web view.
-Decision: Built a custom Regex-based parsing component (WikiText.js) to sanitize and convert wikitext into semantic HTML ('<h3>', <strong>, <em>).
+Decision: Built a custom Regex-based parsing component (WikiText.js) to sanitize and convert wikitext into semantic HTML (h3, strong, em).
 Outcome: Successfully maintained the "Separation of Concerns" principle, keeping the main application logic light while delivering a clean, readable, and professional typography experience.
 
 4. UX Optimization: Layout Refactoring
